@@ -41,11 +41,34 @@ func isIP(host string) bool {
 	return true
 }
 
+func isScheme(scheme string) bool {
+	// the scheme MUST conform to these rules:
+	// 1. begin with a letter, and
+	// 2. followed by any combination of letters, digits, period, or hyphen.
+	if scheme == "" {
+		return false
+	}
+	if strings.Index("abcdefghijklmnopqrstuvwxyz", string(scheme[0])) == -1 {
+		return false
+	}
+	if len(scheme) > 1 {
+		for i := 1; i < len(scheme); i++ {
+			if strings.Index("abcdefghijklmnopqrstuvwxyz01234567890.-", string(scheme[i])) == -1 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func getHost(rawURL string) string {
 	result := strings.ToLower(rawURL)
 	// step #1: remove the scheme
 	i := strings.Index(result, "://")
 	if i > -1 {
+		if !isScheme(result[:i]) {
+			return ""
+		}
 		result = result[i+3:]
 	}
 	// step #2: remove port, path, and query
